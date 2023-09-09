@@ -9,30 +9,16 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  try {
-    res.send({ success: true, message: "Welcome to Spammer!" });
-  } catch (error) {
-    res.send({
-      success: false,
-      error: error.message,
-    });
-  }
+  res.send({ success: true, message: "Welcome to Spammer!" });
 });
 
 // GET all messages
 
 app.get("/messages", async (req, res) => {
-  try {
-    const messages = await prisma.message.findMany({
-      include: { children: { include: { children: true } } },
-    });
-    res.send({ success: true, messages });
-  } catch (error) {
-    res.send({
-      success: false,
-      error: error.message,
-    });
-  }
+  const messages = await prisma.message.findMany({
+    include: { children: { include: { children: true } } },
+  });
+  res.send({ success: true, messages });
 });
 
 // POST - create messages
