@@ -4,9 +4,12 @@ import cors from "cors";
 
 const prisma = new PrismaClient();
 const app = express();
+
 app.use(cors());
 
 app.use(express.json());
+
+// GET - route handler
 
 app.get("/", (req, res) => {
   res.send({ success: true, message: "Welcome to Spammer!" });
@@ -16,7 +19,13 @@ app.get("/", (req, res) => {
 
 app.get("/messages", async (req, res) => {
   const messages = await prisma.message.findMany({
-    include: { children: { include: { children: true } } },
+    include: {
+      children: {
+        include: {
+          children: { include: { children: { include: { children: true } } } },
+        },
+      },
+    },
   });
   res.send({ success: true, messages });
 });
@@ -57,7 +66,7 @@ app.put("/messages/:messageId", async (req, res) => {
       where: { id: messageId },
     });
 
-    if (checkMsg === null) {
+    if (!checkMsg) {
       return res.send({
         success: false,
         error: "Couldn't find ID, please enter a valid ID",
@@ -97,8 +106,7 @@ app.delete("/messages/:messageId", async (req, res) => {
     if (!checkMsg) {
       return res.send({
         success: false,
-        error:
-          "Couldn't find message with the specified ID, please enter a valid ID",
+        error: "Couldn't find ID, please enter a valid ID",
       });
     }
     await prisma.message.delete({ where: { id: messageId } });
